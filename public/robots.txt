@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /daily-uploader.html
+
+Sitemap: https://bloghosting-b5700.web.app/sitemap.xml
+

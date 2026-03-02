@@ -1,0 +1,25 @@
+{
+  "hosting": {
+    "site": "bloghosting-b5700",
+    "public": "public",
+    "predeploy": [
+      "node scripts/build-blog-pages.js"
+    ],
+    "headers": [
+      {
+        "source": "/daily-uploader.html",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow, noarchive"
+          }
+        ]
+      }
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
