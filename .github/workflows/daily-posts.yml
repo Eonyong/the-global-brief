@@ -37,7 +37,8 @@ jobs:
     name: "Generate & Deploy Article"
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write        # git push 권한
+      id-token: write        # Firebase OIDC 인증용
 
     steps:
       # ── 1. Checkout ────────────────────────────────────────────────────────
@@ -71,16 +72,14 @@ jobs:
           GA_MEASUREMENT_ID: "G-L3Z7HC2RGD"
         run: node scripts/build-pages.js
 
-      # ── 5. Deploy to Firebase Hosting ─────────────────────────────────────
+      # ── 5. Deploy to Firebase Hosting (Service Account 방식) ───────────────
       - name: Deploy to Firebase Hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: |
-          npx firebase-tools@latest deploy \
-            --only hosting \
-            --token "$FIREBASE_TOKEN" \
-            --non-interactive \
-            --project bloghosting-b5700
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLOGHOSTING_B5700 }}
+          channelId: live
+          projectId: bloghosting-b5700
 
       # ── 6. Commit & push new post + updated manifest ───────────────────────
       - name: Commit and push changes
