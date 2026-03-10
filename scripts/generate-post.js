@@ -214,7 +214,7 @@ Return ONLY valid JSON (no markdown code fences, no extra text):
     },
   }, {
     model: 'claude-sonnet-4-6',
-    max_tokens: 8192,
+    max_tokens: 16000,
     messages: [{ role: 'user', content: prompt }],
   });
 
@@ -222,11 +222,19 @@ Return ONLY valid JSON (no markdown code fences, no extra text):
     throw new Error(`Claude API ${resp.status}: ${JSON.stringify(resp.data).slice(0, 300)}`);
   }
 
+  // stop_reason 확인 — 'max_tokens'이면 응답이 잘린 것
+  const stopReason = resp.data.stop_reason;
+  if (stopReason === 'max_tokens') {
+    throw new Error('Response truncated by max_tokens limit. Increase max_tokens or shorten the prompt.');
+  }
+
   const raw = resp.data.content[0].text.trim();
+  // markdown 코드 펜스 제거 (```json ... ```)
   const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
   try {
     return JSON.parse(cleaned);
   } catch (e) {
+    console.error('stop_reason:', stopReason);
     console.error('Raw response (first 500 chars):', raw.slice(0, 500));
     throw new Error(`JSON parse failed: ${e.message}`);
   }
