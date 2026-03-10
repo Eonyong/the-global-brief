@@ -1,0 +1,16 @@
+{
+  "name": "the-global-brief",
+  "version": "2.0.0",
+  "description": "The Global Brief — Bilingual politics & economy news blog",
+  "private": true,
+  "scripts": {
+    "generate": "node scripts/generate-post.js",
+    "build": "node scripts/build-pages.js",
+    "generate:dry": "DRY_RUN=1 node scripts/generate-post.js",
+    "deploy": "npm run build && npx firebase-tools deploy --only hosting",
+    "dev": "DRY_RUN=1 node scripts/generate-post.js && node scripts/build-pages.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

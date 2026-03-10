@@ -1,0 +1,93 @@
+name: "📰 Daily Blog Posts — The Global Brief"
+
+on:
+  schedule:
+    # KST 09:00 AM → UTC 00:00 → Politics post
+    - cron: "0 0 * * *"
+    # KST 03:00 PM → UTC 06:00 → Economy post
+    - cron: "0 6 * * *"
+
+  # Allow manual triggering with options
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "Category (politics / economy / auto)"
+        required: false
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - politics
+          - economy
+      custom_topic:
+        description: "Custom topic override (leave empty for auto)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (no API calls, for testing)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  publish:
+    name: "Generate & Deploy Article"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Setup Node.js ───────────────────────────────────────────────────
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # ── 3. Generate article ────────────────────────────────────────────────
+      - name: Generate article
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          BLOG_BASE_URL: "https://bloghosting-b5700.web.app"
+          GA_MEASUREMENT_ID: "G-L3Z7HC2RGD"
+          CATEGORY: ${{ github.event.inputs.category || 'auto' }}
+          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic || '' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
+        run: node scripts/generate-post.js
+
+      # ── 4. Build pages ─────────────────────────────────────────────────────
+      - name: Build homepage & category pages
+        env:
+          BLOG_BASE_URL: "https://bloghosting-b5700.web.app"
+          GA_MEASUREMENT_ID: "G-L3Z7HC2RGD"
+        run: node scripts/build-pages.js
+
+      # ── 5. Deploy to Firebase Hosting ─────────────────────────────────────
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          npx firebase-tools@latest deploy \
+            --only hosting \
+            --token "$FIREBASE_TOKEN" \
+            --non-interactive \
+            --project bloghosting-b5700
+
+      # ── 6. Commit & push new post + updated manifest ───────────────────────
+      - name: Commit and push changes
+        run: |
+          git config --global user.name  "The Global Brief Bot"
+          git config --global user.email "bot@theglobalbrief.com"
+          git add -A
+          # Only commit if there are actual changes
+          git diff --staged --quiet || git commit -m "auto: new post $(date +'%Y-%m-%d %H:%M KST') [skip ci]"
+          git push

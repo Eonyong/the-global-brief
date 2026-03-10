@@ -1,69 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://bloghosting-b5700.web.app/</loc>
-    <lastmod>2026-02-21</lastmod>
+    <loc>https://bloghosting-b5700.web.app</loc>
+    <lastmod>2026-03-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://bloghosting-b5700.web.app/briefings.html</loc>
-    <lastmod>2026-02-21</lastmod>
+    <loc>https://bloghosting-b5700.web.app/politics.html</loc>
+    <lastmod>2026-03-09</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://bloghosting-b5700.web.app/economy.html</loc>
-    <lastmod>2026-02-21</lastmod>
+    <lastmod>2026-03-09</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://bloghosting-b5700.web.app/posts/economy/thrump.html</loc>
-    <lastmod>2026-02-21</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <loc>https://bloghosting-b5700.web.app/about.html</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-21.html</loc>
-    <lastmod>2026-02-21</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-20.html</loc>
-    <lastmod>2026-02-20</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-19.html</loc>
-    <lastmod>2026-02-19</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-18.html</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/economy/kbank-ipo-seo-template-2026-02-18.html</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-17.html</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bloghosting-b5700.web.app/posts/world-news/world-news-2026-02-16.html</loc>
-    <lastmod>2026-02-16</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
+
 </urlset>

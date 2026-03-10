@@ -2,24 +2,28 @@
   "hosting": {
     "site": "bloghosting-b5700",
     "public": "public",
-    "predeploy": [
-      "node scripts/build-blog-pages.js"
-    ],
+    "predeploy": ["node scripts/build-pages.js"],
     "headers": [
       {
-        "source": "/daily-uploader.html",
+        "source": "**/*.html",
         "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, nofollow, noarchive"
-          }
+          { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" }
+        ]
+      },
+      {
+        "source": "/data/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=300" },
+          { "key": "Access-Control-Allow-Origin", "value": "*" }
         ]
       }
     ],
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+    "rewrites": [
+      { "source": "/politics", "destination": "/politics.html" },
+      { "source": "/economy", "destination": "/economy.html" },
+      { "source": "/about", "destination": "/about.html" }
+    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }

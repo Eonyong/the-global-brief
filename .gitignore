@@ -62,8 +62,16 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# dotenv environment variables file — NEVER commit real secrets
 .env
+.env.local
+.env.*.local
 
 # dataconnect generated files
 .dataconnect
+
+# macOS
+.DS_Store
+
+# Claude local settings
+.claude/
