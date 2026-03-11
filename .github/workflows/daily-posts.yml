@@ -73,14 +73,12 @@ jobs:
 
       # ── 5. Deploy to Firebase Hosting ─────────────────────────────────────
       - name: Deploy to Firebase Hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: |
-          npx firebase-tools@latest deploy \
-            --only hosting \
-            --token "$FIREBASE_TOKEN" \
-            --non-interactive \
-            --project bloghosting-b5700
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLOGHOSTING_B5700 }}
+          projectId: bloghosting-b5700
+          channelId: live
 
       # ── 6. Commit & push new post + updated manifest ───────────────────────
       - name: Commit and push changes
