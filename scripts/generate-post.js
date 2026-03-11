@@ -268,20 +268,26 @@ Return ONLY valid JSON matching this exact structure:
     "conclusion": "<p>Synthesize the 2-3 most important threads 80-100 words.</p><p>Closing thought-provoking statement 60-80 words.</p>"
   },
   "ko": {
-    "title": "한국어 헤드라인 (60-85자, 자연스러운 번역)",
-    "subtitle": "한국어 부제목 (90-130자)",
-    "introduction": "<p>첫 번째 문단 100-130 단어.</p><p>두 번째 문단 80-100 단어.</p>",
+    "title": "WRITE THE ACTUAL KOREAN HEADLINE HERE — natural translation of the English title, 60-85 Korean characters",
+    "subtitle": "WRITE THE ACTUAL KOREAN SUBTITLE HERE — natural translation of the English subtitle, 90-130 Korean characters",
+    "introduction": "<p>WRITE ACTUAL KOREAN INTRODUCTION HERE — full natural Korean translation of the English introduction, 100-130 words in Korean.</p><p>WRITE ACTUAL KOREAN CONTEXT PARAGRAPH HERE — full natural Korean translation of the second English introduction paragraph, 80-100 words in Korean.</p>",
     "sections": [
-      {"id":"background","title":"배경","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
-      {"id":"current-situation","title":"현재 상황","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
-      {"id":"key-players","title":"주요 행위자와 이해관계","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
-      {"id":"global-impact","title":"글로벌 영향","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
-      {"id":"outlook","title":"전망 및 분석","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"}
+      {"id":"background","title":"배경","content":"<p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of English background paragraph 1.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of English background paragraph 2.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of English background paragraph 3.</p>"},
+      {"id":"current-situation","title":"현재 상황","content":"<p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of current situation paragraph 1.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of current situation paragraph 2.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of current situation paragraph 3.</p>"},
+      {"id":"key-players","title":"주요 행위자와 이해관계","content":"<p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of key players paragraph 1.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of key players paragraph 2.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of key players paragraph 3.</p>"},
+      {"id":"global-impact","title":"글로벌 영향","content":"<p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of global impact paragraph 1.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of global impact paragraph 2.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of global impact paragraph 3.</p>"},
+      {"id":"outlook","title":"전망 및 분석","content":"<p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of outlook paragraph 1.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of outlook paragraph 2.</p><p>WRITE ACTUAL KOREAN PARAGRAPH — full Korean translation of outlook paragraph 3.</p>"}
     ],
-    "conclusion": "<p>첫 번째 결론 문단.</p><p>마지막 인상적인 마무리 문장.</p>"
+    "conclusion": "<p>WRITE ACTUAL KOREAN CONCLUSION — full Korean translation of conclusion paragraph 1.</p><p>WRITE ACTUAL KOREAN CLOSING — full Korean translation of the memorable closing sentence.</p>"
   },
   "imageQuery": "2-4 word English Pexels search query"
-}`;
+}
+
+IMPORTANT REMINDER FOR THE ko FIELDS ABOVE:
+- Replace every field that says 'WRITE ACTUAL KOREAN...' with real, natural Korean sentences.
+- The ko section must be a COMPLETE, FLUENT Korean translation of all English content.
+- Do NOT leave any placeholder text. Every <p> tag must contain real Korean prose.
+- Korean style: 한국 독자 대상, 자연스러운 문어체, 신문 기사 톤`;
 
   const resp = await httpsRequest({
     hostname: 'api.anthropic.com',
@@ -349,6 +355,26 @@ async function fetchImage(query) {
 // ── HTML helpers ──────────────────────────────────────────────────────────────
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+// ── Ad unit HTML with placeholder fallback ────────────────────────────────────
+let _adIdx = 0;
+function adUnit({ layout = '', format = 'auto', slot = '', inArticle = false } = {}) {
+  const id = `ad-wrap-${++_adIdx}`;
+  const insAttrs = inArticle
+    ? `style="display:block;text-align:center;" data-ad-layout="in-article" data-ad-format="fluid"`
+    : `style="display:block" data-ad-format="${format}" data-full-width-responsive="true"`;
+  return `<div class="ad-unit" id="${id}">
+<p class="ad-label">Advertisement</p>
+<div class="ad-ph">
+  <div class="ad-ph-inner">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="28" height="28" rx="4" fill="#e4e4e7"/><text x="14" y="19" text-anchor="middle" font-size="13" font-family="sans-serif" fill="#a1a1aa">Ad</text></svg>
+    <span>Advertisement coming soon</span>
+  </div>
+</div>
+<ins class="adsbygoogle" ${insAttrs} data-ad-client="${ADS_CLIENT}" data-ad-slot="${slot}"></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
+</div>`;
+}
+
 // ── Build article HTML ────────────────────────────────────────────────────────
 function buildArticleHtml(article, image, slug, category, dateStr, isoDate) {
   const catLabel = category === 'politics' ? 'Politics' : 'Economy';
@@ -362,11 +388,7 @@ function buildArticleHtml(article, image, slug, category, dateStr, isoDate) {
     const pullQ = s.pullQuote
       ? `<blockquote class="pull-quote"><p>${esc(s.pullQuote)}</p></blockquote>`
       : '';
-    const midAd = i === 1
-      ? `<div class="ad-unit"><p class="ad-label">Advertisement</p>
-<ins class="adsbygoogle" style="display:block;text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="${ADS_CLIENT}" data-ad-slot=""></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>`
-      : '';
+    const midAd = i === 1 ? adUnit({ inArticle: true }) : '';
     return `<section id="${esc(s.id)}" class="article-section">
 <h2 class="section-title">${esc(s.title)}</h2>
 ${s.content}
@@ -496,8 +518,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .takeaways li{font-size:.92rem;color:var(--text2);padding-left:22px;position:relative;line-height:1.55}
 .takeaways li::before{content:'→';position:absolute;left:0;color:var(--red);font-weight:700}
 /* Ad units */
-.ad-unit{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:30px 0;text-align:center}
+.ad-unit{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:30px 0;text-align:center;position:relative;overflow:hidden}
 .ad-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+/* Ad placeholder — shown until AdSense fills the slot */
+.ad-ph{display:flex;align-items:center;justify-content:center;min-height:90px;background:repeating-linear-gradient(45deg,#f9f9fb,#f9f9fb 10px,#f4f5f7 10px,#f4f5f7 20px);border-radius:6px;margin-bottom:4px}
+.ad-ph-inner{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.45}
+.ad-ph-inner span{font-size:.75rem;color:var(--muted);font-weight:500}
+/* Hide placeholder once AdSense renders a real ad */
+.ad-unit.ad-loaded .ad-ph{display:none}
 /* Lang tabs */
 .lang-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:26px;width:fit-content}
 .lang-tab{background:none;border:none;border-right:1px solid var(--border);padding:9px 20px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--sans);color:var(--muted);transition:all .18s}
@@ -614,11 +642,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     </div>
 
     <!-- Top ad -->
-    <div class="ad-unit">
-      <p class="ad-label">Advertisement</p>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="${ADS_CLIENT}" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    </div>
+    ${adUnit()}
 
     <!-- Language tabs -->
     <div class="lang-tabs">
@@ -650,11 +674,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     </div>
 
     <!-- Bottom ad -->
-    <div class="ad-unit">
-      <p class="ad-label">Advertisement</p>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="${ADS_CLIENT}" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    </div>
+    ${adUnit()}
 
     <!-- Tags -->
     <div class="tags-wrap">
@@ -669,11 +689,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <div class="toc-head">Contents</div>
       ${tocHtml}
     </div>
-    <div class="ad-side">
-      <p class="ad-label">Advertisement</p>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="${ADS_CLIENT}" data-ad-slot="" data-ad-format="auto"></ins>
-      <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    </div>
+    ${adUnit()}
   </aside>
 </div>
 
@@ -734,22 +750,49 @@ function highlightToc(){
 var currentLang='en';
 function setLang(lang){
   currentLang=lang;
-  var en=document.getElementById('content-en');
-  var ko=document.getElementById('content-ko');
+  var enDiv=document.getElementById('content-en');
+  var koDiv=document.getElementById('content-ko');
   var tabEn=document.getElementById('tab-en');
   var tabKo=document.getElementById('tab-ko');
   var heroBtn=document.getElementById('hero-lang-btn');
+  if(!enDiv||!koDiv){return;}
   if(lang==='ko'){
-    en.style.display='none';ko.style.display='block';
-    tabEn.classList.remove('active');tabKo.classList.add('active');
-    if(heroBtn){heroBtn.textContent='🇺🇸 Read in English';heroBtn.dataset.lang='ko';}
+    enDiv.style.display='none';
+    koDiv.style.display='block';
+    if(tabEn){tabEn.classList.remove('active');}
+    if(tabKo){tabKo.classList.add('active');}
+    if(heroBtn){heroBtn.textContent='🇺🇸 Read in English';}
+    try{localStorage.setItem('tgb-lang','ko');}catch(e){}
   } else {
-    en.style.display='block';ko.style.display='none';
-    tabEn.classList.add('active');tabKo.classList.remove('active');
-    if(heroBtn){heroBtn.textContent='🇰🇷 한국어로 보기';heroBtn.dataset.lang='en';}
+    enDiv.style.display='block';
+    koDiv.style.display='none';
+    if(tabEn){tabEn.classList.add('active');}
+    if(tabKo){tabKo.classList.remove('active');}
+    if(heroBtn){heroBtn.textContent='🇰🇷 한국어로 보기';}
+    try{localStorage.setItem('tgb-lang','en');}catch(e){}
   }
 }
 function toggleLang(){setLang(currentLang==='en'?'ko':'en');}
+// Restore last chosen language
+try{var _sl=localStorage.getItem('tgb-lang');if(_sl==='ko')setLang('ko');}catch(e){}
+
+// Hide ad placeholders once AdSense fills slots
+(function(){
+  function checkAds(){
+    document.querySelectorAll('.ad-unit').forEach(function(wrap){
+      var ins=wrap.querySelector('ins.adsbygoogle');
+      if(ins&&ins.getAttribute('data-ad-status')==='filled'){
+        wrap.classList.add('ad-loaded');
+      }
+    });
+  }
+  // Check on load and again after a delay (AdSense loads async)
+  window.addEventListener('load',function(){
+    checkAds();
+    setTimeout(checkAds,2500);
+    setTimeout(checkAds,6000);
+  });
+})();
 
 // Related articles
 (async function(){
