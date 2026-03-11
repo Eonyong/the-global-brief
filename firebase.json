@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "bloghosting-b5700",
+    "site": "the-global-brief-504d5",
     "public": "public",
     "predeploy": ["node scripts/build-pages.js"],
     "headers": [

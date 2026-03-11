@@ -17,7 +17,7 @@ const BLOG_NAME = 'The Global Brief';
 const BLOG_TAGLINE = 'Global Politics & Economy, Explained';
 const ADS_CLIENT = 'ca-pub-3898675618700513';
 const GTM_ID = 'GTM-TP2SWKBR';
-const BLOG_BASE_URL = process.env.BLOG_BASE_URL || 'https://bloghosting-b5700.web.app';
+const BLOG_BASE_URL = process.env.BLOG_BASE_URL || 'https://the-global-brief-504d5.web.app';
 const GA_ID = process.env.GA_MEASUREMENT_ID || 'G-L3Z7HC2RGD';
 
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');

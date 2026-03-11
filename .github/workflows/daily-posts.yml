@@ -57,7 +57,7 @@ jobs:
         env:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          BLOG_BASE_URL: "https://bloghosting-b5700.web.app"
+          BLOG_BASE_URL: "https://the-global-brief-504d5.web.app"
           GA_MEASUREMENT_ID: "G-L3Z7HC2RGD"
           CATEGORY: ${{ github.event.inputs.category || 'auto' }}
           CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic || '' }}
@@ -67,7 +67,7 @@ jobs:
       # ── 4. Build pages ─────────────────────────────────────────────────────
       - name: Build homepage & category pages
         env:
-          BLOG_BASE_URL: "https://bloghosting-b5700.web.app"
+          BLOG_BASE_URL: "https://the-global-brief-504d5.web.app"
           GA_MEASUREMENT_ID: "G-L3Z7HC2RGD"
         run: node scripts/build-pages.js
 
@@ -76,8 +76,8 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLOGHOSTING_B5700 }}
-          projectId: bloghosting-b5700
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_THE_GLOBAL_BRIEF_504D5 }}
+          projectId: the-global-brief-504d5
           channelId: live
 
       # ── 6. Commit & push new post + updated manifest ───────────────────────

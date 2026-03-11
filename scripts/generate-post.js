@@ -7,7 +7,7 @@
  *   PEXELS_API_KEY   — Free Pexels API key (pexels.com/api)
  *
  * Optional:
- *   BLOG_BASE_URL    — Site base URL (default: https://bloghosting-b5700.web.app)
+ *   BLOG_BASE_URL    — Site base URL (default: https://the-global-brief-504d5.web.app)
  *   GA_MEASUREMENT_ID — Google Analytics ID
  *   CATEGORY         — Force "politics" | "economy" | "auto" (default: auto)
  *   CUSTOM_TOPIC     — Override topic text
@@ -27,7 +27,7 @@ const POSTS_DIR = path.join(ROOT, 'public', 'posts');
 const BLOG_NAME = 'The Global Brief';
 const ADS_CLIENT = 'ca-pub-3898675618700513';
 const GTM_ID = 'GTM-TP2SWKBR';
-const BLOG_BASE_URL = process.env.BLOG_BASE_URL || 'https://bloghosting-b5700.web.app';
+const BLOG_BASE_URL = process.env.BLOG_BASE_URL || 'https://the-global-brief-504d5.web.app';
 const GA_ID = process.env.GA_MEASUREMENT_ID || 'G-L3Z7HC2RGD';
 const CLAUDE_KEY = process.env.CLAUDE_API_KEY;
 const PEXELS_KEY = process.env.PEXELS_API_KEY;
