@@ -107,6 +107,77 @@ function pickTopic() {
   return { category, topic };
 }
 
+// ── JSON repair: fix unescaped double-quotes inside string values ─────────────
+function repairJSON(str) {
+  // State-machine scan: when inside a JSON string, any bare " that doesn't
+  // look like a closing quote (i.e. next non-space char is NOT , } ] :)
+  // gets escaped as \".
+  let out = '';
+  let inStr = false;
+  let esc = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+
+    if (esc) { out += ch; esc = false; continue; }
+    if (ch === '\\') { out += ch; esc = true; continue; }
+
+    if (ch === '"') {
+      if (!inStr) {
+        inStr = true;
+        out += ch;
+      } else {
+        // Peek ahead past whitespace to see what follows
+        let j = i + 1;
+        while (j < str.length && /[ \t\r\n]/.test(str[j])) j++;
+        const next = str[j];
+        // A proper closing quote is followed by , } ] : or end-of-string
+        if (next === ',' || next === '}' || next === ']' || next === ':' || j >= str.length) {
+          inStr = false;
+          out += ch;
+        } else {
+          // Unescaped quote inside a string value — escape it
+          out += '\\"';
+        }
+      }
+      continue;
+    }
+
+    out += ch;
+  }
+  return out;
+}
+
+// ── Safely extract and parse JSON from Claude's raw response ─────────────────
+function safeParseJSON(raw, stopReason) {
+  // 1. Strip markdown code fences if present
+  let s = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+
+  // 2. Extract the outermost { ... } block
+  const start = s.indexOf('{');
+  const end   = s.lastIndexOf('}');
+  if (start !== -1 && end > start) s = s.slice(start, end + 1);
+
+  // 3. First attempt: direct parse
+  try { return JSON.parse(s); } catch (e1) {
+    console.warn(`Direct JSON.parse failed (${e1.message}), attempting repair…`);
+    // Show context around the error position for debugging
+    const pos = parseInt((e1.message.match(/position (\d+)/) || [])[1], 10);
+    if (!isNaN(pos)) {
+      console.error('  Context around error:', JSON.stringify(s.slice(Math.max(0, pos - 60), pos + 60)));
+    }
+
+    // 4. Attempt repair: escape bare double-quotes inside string values
+    const repaired = repairJSON(s);
+    try { return JSON.parse(repaired); } catch (e2) {
+      // 5. Last resort: log and throw
+      console.error('stop_reason:', stopReason);
+      console.error('Raw response (first 600 chars):', raw.slice(0, 600));
+      throw new Error(`JSON parse failed after repair attempt: ${e2.message}`);
+    }
+  }
+}
+
 // ── Generate article via Claude ───────────────────────────────────────────────
 async function generateArticle(category, topicText) {
   if (DRY_RUN) { console.log('[DRY RUN] Skipping Claude API'); return makeSample(category, topicText); }
@@ -130,7 +201,16 @@ REQUIREMENTS:
 - Make it timely, not generic — reference current 2025-2026 geopolitical context
 - Writing style: The Economist + Foreign Affairs combined
 
-Return ONLY valid JSON (no markdown code fences, no extra text):
+CRITICAL JSON RULES — MUST FOLLOW TO AVOID PARSE ERRORS:
+1. Return ONLY a single valid JSON object. No markdown fences, no text before or after.
+2. NEVER use double-quote characters (") inside any JSON string value.
+   - For possessives and contractions: use apostrophe (') — e.g. America's, don't
+   - For speech/quotations inside text: use single quotes (') — e.g. 'We have no choice'
+   - For HTML attributes: OMIT attributes entirely — write plain <p>, <strong>, <em>, <b> with NO class= or style= attributes
+3. NEVER put literal newlines inside a JSON string value — keep each string on one line.
+4. Escape any backslash as \\\\ if you must include one.
+
+Return ONLY valid JSON matching this exact structure:
 {
   "title": "Strong present-tense English headline, 60-85 chars",
   "subtitle": "One-sentence analytical deck adding crucial context, 90-130 chars",
@@ -153,54 +233,54 @@ Return ONLY valid JSON (no markdown code fences, no extra text):
     {"id":"outlook","title":"Outlook & Analysis"}
   ],
   "en": {
-    "introduction": "<p>Hook paragraph: open with the most striking fact or development — grab the reader in the first two sentences. (100-130 words)</p><p>Context paragraph: explain why this matters RIGHT NOW globally. (80-100 words)</p>",
+    "introduction": "<p>Hook paragraph 100-130 words.</p><p>Context paragraph 80-100 words.</p>",
     "sections": [
       {
         "id": "background",
         "title": "Background",
-        "content": "<p>First paragraph with historical context and origins. (80-100 words)</p><p>Second paragraph deepening context with specific events and dates. (80-100 words)</p><p>Third paragraph connecting background to present. (70-90 words)</p>",
-        "pullQuote": "A striking statistic or expert quote from this section, 20-40 words"
+        "content": "<p>First paragraph 80-100 words.</p><p>Second paragraph 80-100 words.</p><p>Third paragraph 70-90 words.</p>",
+        "pullQuote": "A striking statistic or expert perspective from this section, 20-40 words, no double-quotes"
       },
       {
         "id": "current-situation",
         "title": "Current Situation",
-        "content": "<p>What is happening RIGHT NOW with specific details. (80-100 words)</p><p>Recent developments and data. (80-100 words)</p><p>Latest news and reactions. (70-90 words)</p>",
-        "pullQuote": "Key data point or quote that defines the current moment"
+        "content": "<p>What is happening RIGHT NOW with specific details 80-100 words.</p><p>Recent developments and data 80-100 words.</p><p>Latest news and reactions 70-90 words.</p>",
+        "pullQuote": "Key data point that defines the current moment, no double-quotes"
       },
       {
         "id": "key-players",
         "title": "Key Players & Interests",
-        "content": "<p>Primary actor 1: who they are, what they want, why it matters. (80-100 words)</p><p>Primary actor 2 and opposing interests. (80-100 words)</p><p>Third-party stakeholders and their roles. (70-90 words)</p>"
+        "content": "<p>Primary actor 1: who they are, what they want, why it matters 80-100 words.</p><p>Primary actor 2 and opposing interests 80-100 words.</p><p>Third-party stakeholders and their roles 70-90 words.</p>"
       },
       {
         "id": "global-impact",
         "title": "Global Impact",
-        "content": "<p>Economic/financial implications with specific numbers. (80-100 words)</p><p>Geopolitical ripple effects across regions. (80-100 words)</p><p>Impact on ordinary citizens and markets. (70-90 words)</p>",
-        "pullQuote": "The most striking impact statistic or projection"
+        "content": "<p>Economic/financial implications with specific numbers 80-100 words.</p><p>Geopolitical ripple effects across regions 80-100 words.</p><p>Impact on ordinary citizens and markets 70-90 words.</p>",
+        "pullQuote": "The most striking impact statistic or projection, no double-quotes"
       },
       {
         "id": "outlook",
         "title": "Outlook & Analysis",
-        "content": "<p>Most likely scenario with expert consensus. (80-100 words)</p><p>Wild card scenarios and risk factors. (80-100 words)</p><p>Strategic implications for the next 12 months. (70-90 words)</p>",
-        "pullQuote": "A forward-looking insight that makes readers think"
+        "content": "<p>Most likely scenario with expert consensus 80-100 words.</p><p>Wild card scenarios and risk factors 80-100 words.</p><p>Strategic implications for the next 12 months 70-90 words.</p>",
+        "pullQuote": "A forward-looking insight that makes readers think, no double-quotes"
       }
     ],
-    "conclusion": "<p>Synthesize the 2-3 most important threads. (80-100 words)</p><p>Closing statement that is thought-provoking and memorable — leave the reader with something to reflect on. (60-80 words)</p>"
+    "conclusion": "<p>Synthesize the 2-3 most important threads 80-100 words.</p><p>Closing thought-provoking statement 60-80 words.</p>"
   },
   "ko": {
     "title": "한국어 헤드라인 (60-85자, 자연스러운 번역)",
     "subtitle": "한국어 부제목 (90-130자)",
-    "introduction": "<p>첫 번째 문단: 가장 충격적인 사실로 시작 (100-130 단어)</p><p>두 번째 문단: 왜 지금 중요한지 설명 (80-100 단어)</p>",
+    "introduction": "<p>첫 번째 문단 100-130 단어.</p><p>두 번째 문단 80-100 단어.</p>",
     "sections": [
-      {"id":"background","title":"배경","content":"<p>첫 번째 문단</p><p>두 번째 문단</p><p>세 번째 문단</p>"},
-      {"id":"current-situation","title":"현재 상황","content":"<p>첫 번째 문단</p><p>두 번째 문단</p><p>세 번째 문단</p>"},
-      {"id":"key-players","title":"주요 행위자와 이해관계","content":"<p>첫 번째 문단</p><p>두 번째 문단</p><p>세 번째 문단</p>"},
-      {"id":"global-impact","title":"글로벌 영향","content":"<p>첫 번째 문단</p><p>두 번째 문단</p><p>세 번째 문단</p>"},
-      {"id":"outlook","title":"전망 및 분석","content":"<p>첫 번째 문단</p><p>두 번째 문단</p><p>세 번째 문단</p>"}
+      {"id":"background","title":"배경","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
+      {"id":"current-situation","title":"현재 상황","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
+      {"id":"key-players","title":"주요 행위자와 이해관계","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
+      {"id":"global-impact","title":"글로벌 영향","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"},
+      {"id":"outlook","title":"전망 및 분석","content":"<p>첫 번째 문단.</p><p>두 번째 문단.</p><p>세 번째 문단.</p>"}
     ],
-    "conclusion": "<p>첫 번째 결론 문단</p><p>마지막 인상적인 마무리 문장</p>"
+    "conclusion": "<p>첫 번째 결론 문단.</p><p>마지막 인상적인 마무리 문장.</p>"
   },
-  "imageQuery": "2-4 word English Pexels search query (e.g. 'NATO summit Brussels')"
+  "imageQuery": "2-4 word English Pexels search query"
 }`;
 
   const resp = await httpsRequest({
@@ -229,15 +309,7 @@ Return ONLY valid JSON (no markdown code fences, no extra text):
   }
 
   const raw = resp.data.content[0].text.trim();
-  // markdown 코드 펜스 제거 (```json ... ```)
-  const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch (e) {
-    console.error('stop_reason:', stopReason);
-    console.error('Raw response (first 500 chars):', raw.slice(0, 500));
-    throw new Error(`JSON parse failed: ${e.message}`);
-  }
+  return safeParseJSON(raw, stopReason);
 }
 
 // ── Fetch image from Pexels ───────────────────────────────────────────────────
