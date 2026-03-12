@@ -1,5 +1,24 @@
 [
   {
+    "slug": "pipeline-test-2026-03-12",
+    "title": "[TEST] AI economy: how artificial intelligence is transforming jobs: Analysis & Outlook",
+    "subtitle": "A test article to verify the blog automation pipeline is working correctly",
+    "category": "economy",
+    "dateStr": "March 12, 2026",
+    "isoDate": "2026-03-12T14:07:06.666Z",
+    "url": "/posts/economy/pipeline-test-2026-03-12.html",
+    "imageUrl": "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "tags": [
+      "test",
+      "dry-run",
+      "economy",
+      "automation",
+      "global"
+    ],
+    "readingTime": 9,
+    "metaDescription": "Test article for The Global Brief blog automation system. Real content is generated with Claude API."
+  },
+  {
     "slug": "ai-economy-jobs-global-transformation-2026-03-12",
     "title": "AI Reshapes the Global Workforce at Unprecedented Speed",
     "subtitle": "From Seoul to São Paulo, automation is eliminating and creating jobs faster than policy can respond.",

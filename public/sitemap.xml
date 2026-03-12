@@ -26,16 +26,46 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://the-global-brief-504d5.web.app/posts/economy/pipeline-test-2026-03-12.html</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>The Global Brief</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-03-12T14:07:06.666Z</news:publication_date>
+      <news:title>[TEST] AI economy: how artificial intelligence is transforming jobs: Analysis &amp; Outlook</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://the-global-brief-504d5.web.app/posts/economy/ai-economy-jobs-global-transformation-2026-03-12.html</loc>
     <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>The Global Brief</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-03-12T07:02:38.667Z</news:publication_date>
+      <news:title>AI Reshapes the Global Workforce at Unprecedented Speed</news:title>
+    </news:news>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/posts/politics/nato-evolution-european-security-2026-2026-03-12.html</loc>
     <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>The Global Brief</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-03-12T01:28:19.278Z</news:publication_date>
+      <news:title>NATO Reinvents Itself as Europe Faces Its Gravest Security Test</news:title>
+    </news:news>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/posts/economy/sp500-outlook-investor-sentiment-2026-2026-03-11.html</loc>
@@ -47,8 +77,8 @@
         <news:name>The Global Brief</news:name>
         <news:language>en</news:language>
       </news:publication>
-      <news:publication_date>2026-03-11T12:50:30.738Z</news:publication_date>
-      <news:title>S&amp;P 500 Navigates a Treacherous 2026 Landscape</news:title>
+      <news:publication_date>2026-03-11T22:21:05.625Z</news:publication_date>
+      <news:title>S&amp;P 500 Faces a Defining Year as Sentiment Wavers in 2026</news:title>
     </news:news>
   </url>
 </urlset>
