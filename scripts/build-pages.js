@@ -4,49 +4,64 @@
  * Generates: index.html, politics.html, economy.html, sitemap.xml
  * Reads from: data/posts.json
  */
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const ROOT = process.cwd();
-const DATA_FILE = path.join(ROOT, 'data', 'posts.json');
-const PUBLIC = path.join(ROOT, 'public');
+const DATA_FILE = path.join(ROOT, "data", "posts.json");
+const PUBLIC = path.join(ROOT, "public");
 
-const BLOG_NAME = 'The Global Brief';
-const BLOG_TAGLINE = 'Global Politics & Economy, Explained';
-const ADS_CLIENT = 'ca-pub-3898675618700513';
-const GTM_ID = 'GTM-TP2SWKBR';
-const BLOG_BASE_URL = process.env.BLOG_BASE_URL || 'https://the-global-brief-504d5.web.app';
-const GA_ID = process.env.GA_MEASUREMENT_ID || 'G-L3Z7HC2RGD';
+const BLOG_NAME = "The Global Brief";
+const BLOG_TAGLINE = "Global Politics & Economy, Explained";
+const ADS_CLIENT = "ca-pub-3898675618700513";
+const GTM_ID = "GTM-TP2SWKBR";
+const BLOG_BASE_URL =
+  process.env.BLOG_BASE_URL || "https://the-global-brief-504d5.web.app";
+const GA_ID = process.env.GA_MEASUREMENT_ID || "G-L3Z7HC2RGD";
 
-const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const esc = (s) =>
+  String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 // ── Read posts ────────────────────────────────────────────────────────────────
 function readPosts() {
   if (!fs.existsSync(DATA_FILE)) return [];
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); } catch { return []; }
+  try {
+    return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+  } catch {
+    return [];
+  }
 }
 
 // ── Shared header/footer HTML ─────────────────────────────────────────────────
 function websiteSchema() {
   return JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     name: BLOG_NAME,
     url: BLOG_BASE_URL,
-    description: 'In-depth analysis of global politics and economics — in English and Korean.',
-    inLanguage: ['en', 'ko'],
+    description:
+      "In-depth analysis of global politics and economics — in English and Korean.",
+    inLanguage: ["en", "ko"],
     publisher: {
-      '@type': 'Organization',
+      "@type": "Organization",
       name: BLOG_NAME,
       url: BLOG_BASE_URL,
-      logo: { '@type': 'ImageObject', url: `${BLOG_BASE_URL}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${BLOG_BASE_URL}/logo.png` },
     },
     potentialAction: {
-      '@type': 'SearchAction',
-      target: { '@type': 'EntryPoint', urlTemplate: `${BLOG_BASE_URL}/?q={search_term_string}` },
-      'query-input': 'required name=search_term_string',
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BLOG_BASE_URL}/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
     },
   });
 }
@@ -54,7 +69,7 @@ function websiteSchema() {
 function sharedHead(title, desc, url, ogImage, extraSchema) {
   const schemaBlock = extraSchema
     ? `<script type="application/ld+json">${extraSchema}</script>`
-    : '';
+    : "";
   return `<head>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');</script>
@@ -63,13 +78,14 @@ function sharedHead(title, desc, url, ogImage, extraSchema) {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="google-site-verification" content="UHheXZQb222-Nj4Ib3R_5iY9ZUTbPFudBsT4dS6jC5g" />
 <link rel="canonical" href="${esc(url)}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(url)}">
 <meta property="og:site_name" content="${BLOG_NAME}">
-${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ''}
+${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ""}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
@@ -132,9 +148,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
 function sharedHeader(activeNav) {
   const links = [
-    { href: '/politics.html', label: 'Politics', key: 'politics' },
-    { href: '/economy.html', label: 'Economy', key: 'economy' },
-    { href: '/about.html', label: 'About', key: 'about' },
+    { href: "/politics.html", label: "Politics", key: "politics" },
+    { href: "/economy.html", label: "Economy", key: "economy" },
+    { href: "/about.html", label: "About", key: "about" },
   ];
   return `<!-- GTM noscript -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -142,7 +158,7 @@ function sharedHeader(activeNav) {
   <div class="hdr-inner">
     <a href="/" class="logo">The <em>Global</em> Brief</a>
     <nav class="main-nav">
-      ${links.map((l) => `<a href="${l.href}"${l.key === activeNav ? ' class="active"' : ''}>${l.label}</a>`).join('\n      ')}
+      ${links.map((l) => `<a href="${l.href}"${l.key === activeNav ? ' class="active"' : ""}>${l.label}</a>`).join("\n      ")}
       <a href="/" class="nav-cta">Latest</a>
     </nav>
   </div>
@@ -169,11 +185,11 @@ function sharedFooter(year) {
 // ── Card HTML ─────────────────────────────────────────────────────────────────
 function postCard(post) {
   return `<a href="${esc(post.url)}" class="post-card">
-  <img class="card-img" src="${esc(post.imageUrl || '')}" alt="${esc(post.title)}" loading="lazy" onerror="this.style.background='#e0e0e0';this.removeAttribute('src')">
+  <img class="card-img" src="${esc(post.imageUrl || "")}" alt="${esc(post.title)}" loading="lazy" onerror="this.style.background='#e0e0e0';this.removeAttribute('src')">
   <div class="card-body">
     <div class="card-cat">${esc(post.category)}</div>
     <div class="card-title">${esc(post.title)}</div>
-    <div class="card-sub">${esc(post.subtitle || post.metaDescription || '')}</div>
+    <div class="card-sub">${esc(post.subtitle || post.metaDescription || "")}</div>
     <div class="card-meta">
       <time>${esc(post.dateStr)}</time>
       <span class="card-sep">·</span>
@@ -187,20 +203,21 @@ function postCard(post) {
 function buildIndex(posts) {
   const year = new Date().getFullYear();
   const latest = posts[0];
-  const featOgImg = latest ? latest.imageUrl : '';
+  const featOgImg = latest ? latest.imageUrl : "";
 
   // Hero: latest post
-  const heroHtml = latest ? `
+  const heroHtml = latest
+    ? `
 <section style="background:var(--navy);margin-bottom:0">
   <div style="position:relative;height:520px;overflow:hidden;background:#111">
-    <img src="${esc(latest.imageUrl || '')}" alt="${esc(latest.title)}" style="width:100%;height:100%;object-fit:cover;opacity:.55" loading="eager" onerror="this.style.background='#111';this.removeAttribute('src')">
+    <img src="${esc(latest.imageUrl || "")}" alt="${esc(latest.title)}" style="width:100%;height:100%;object-fit:cover;opacity:.55" loading="eager" onerror="this.style.background='#111';this.removeAttribute('src')">
     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);display:flex;align-items:flex-end">
       <div style="max-width:780px;margin:0 auto;width:100%;padding:0 20px 44px">
         <span style="display:inline-block;background:var(--red);color:#fff;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;padding:4px 11px;border-radius:3px;margin-bottom:14px">${esc(latest.category)}</span>
         <h2 style="font-family:var(--serif);font-size:clamp(1.6rem,3.8vw,2.6rem);font-weight:900;color:#fff;line-height:1.22;margin-bottom:12px">
           <a href="${esc(latest.url)}" style="color:inherit;text-decoration:none">${esc(latest.title)}</a>
         </h2>
-        <p style="font-size:1.05rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:18px;max-width:560px">${esc(latest.subtitle || latest.metaDescription || '')}</p>
+        <p style="font-size:1.05rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:18px;max-width:560px">${esc(latest.subtitle || latest.metaDescription || "")}</p>
         <div style="display:flex;align-items:center;gap:10px;font-size:.8rem;color:rgba(255,255,255,.6)">
           <time>${esc(latest.dateStr)}</time>
           <span>·</span>
@@ -210,7 +227,8 @@ function buildIndex(posts) {
       </div>
     </div>
   </div>
-</section>` : `
+</section>`
+    : `
 <section style="background:var(--navy);padding:80px 20px;text-align:center;color:#fff">
   <h1 style="font-family:var(--serif);font-size:2.2rem;margin-bottom:14px">The Global Brief</h1>
   <p style="font-size:1.1rem;color:rgba(255,255,255,.7);max-width:500px;margin:0 auto">${BLOG_TAGLINE}</p>
@@ -219,15 +237,17 @@ function buildIndex(posts) {
 
   // Recent grid (skip latest, show next 6)
   const recentPosts = posts.slice(1, 7);
-  const recentGrid = recentPosts.length ? `
+  const recentGrid = recentPosts.length
+    ? `
 <section style="padding:48px 0">
   <div class="container">
     <div class="section-head"><h2>Latest Stories</h2><a href="/politics.html">View All →</a></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px">
-      ${recentPosts.map(postCard).join('\n      ')}
+      ${recentPosts.map(postCard).join("\n      ")}
     </div>
   </div>
-</section>` : '';
+</section>`
+    : "";
 
   // Top ad
   const topAd = `
@@ -240,16 +260,20 @@ function buildIndex(posts) {
 </div>`;
 
   // Politics section
-  const politicsPosts = posts.filter((p) => p.category === 'politics').slice(0, 3);
-  const politicsSection = politicsPosts.length ? `
+  const politicsPosts = posts
+    .filter((p) => p.category === "politics")
+    .slice(0, 3);
+  const politicsSection = politicsPosts.length
+    ? `
 <section style="padding:44px 0;background:var(--card);border-top:1px solid var(--border)">
   <div class="container">
     <div class="section-head"><h2>🏛 Politics</h2><a href="/politics.html">More Politics →</a></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
-      ${politicsPosts.map(postCard).join('\n      ')}
+      ${politicsPosts.map(postCard).join("\n      ")}
     </div>
   </div>
-</section>` : '';
+</section>`
+    : "";
 
   // Mid ad
   const midAd = `
@@ -262,20 +286,24 @@ function buildIndex(posts) {
 </div>`;
 
   // Economy section
-  const economyPosts = posts.filter((p) => p.category === 'economy').slice(0, 3);
-  const economySection = economyPosts.length ? `
+  const economyPosts = posts
+    .filter((p) => p.category === "economy")
+    .slice(0, 3);
+  const economySection = economyPosts.length
+    ? `
 <section style="padding:44px 0">
   <div class="container">
     <div class="section-head"><h2>📈 Economy</h2><a href="/economy.html">More Economy →</a></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
-      ${economyPosts.map(postCard).join('\n      ')}
+      ${economyPosts.map(postCard).join("\n      ")}
     </div>
   </div>
-</section>` : '';
+</section>`
+    : "";
 
   const html = `<!DOCTYPE html>
 <html lang="en">
-${sharedHead(`${BLOG_NAME} | ${BLOG_TAGLINE}`, 'In-depth analysis of global politics and economics — in English and Korean. Published twice daily.', BLOG_BASE_URL, featOgImg, websiteSchema())}
+${sharedHead(`${BLOG_NAME} | ${BLOG_TAGLINE}`, "In-depth analysis of global politics and economics — in English and Korean. Published twice daily.", BLOG_BASE_URL, featOgImg, websiteSchema())}
 <body>
 ${sharedHeader()}
 ${heroHtml}
@@ -288,29 +316,35 @@ ${sharedFooter(year)}
 </body>
 </html>`;
 
-  fs.writeFileSync(path.join(PUBLIC, 'index.html'), html, 'utf8');
-  console.log('✅  index.html built');
+  fs.writeFileSync(path.join(PUBLIC, "index.html"), html, "utf8");
+  console.log("✅  index.html built");
 }
 
 // ── Build category page ───────────────────────────────────────────────────────
 function breadcrumbSchema(category, catLabelPlain) {
   return JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: BLOG_BASE_URL },
-      { '@type': 'ListItem', position: 2, name: catLabelPlain, item: `${BLOG_BASE_URL}/${category}.html` },
+      { "@type": "ListItem", position: 1, name: "Home", item: BLOG_BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: catLabelPlain,
+        item: `${BLOG_BASE_URL}/${category}.html`,
+      },
     ],
   });
 }
 
 function buildCategory(category, posts) {
   const year = new Date().getFullYear();
-  const catLabel = category === 'politics' ? '🏛 Politics' : '📈 Economy';
-  const catLabelPlain = category === 'politics' ? 'Politics' : 'Economy';
-  const catDesc = category === 'politics'
-    ? 'In-depth analysis of global political developments, geopolitics, elections, and diplomacy.'
-    : 'Expert coverage of global markets, central banks, trade, technology, and economic trends.';
+  const catLabel = category === "politics" ? "🏛 Politics" : "📈 Economy";
+  const catLabelPlain = category === "politics" ? "Politics" : "Economy";
+  const catDesc =
+    category === "politics"
+      ? "In-depth analysis of global political developments, geopolitics, elections, and diplomacy."
+      : "Expert coverage of global markets, central banks, trade, technology, and economic trends.";
   const filteredPosts = posts.filter((p) => p.category === category);
   const title = `${catLabel} | ${BLOG_NAME}`;
 
@@ -322,7 +356,7 @@ function buildCategory(category, posts) {
 
   const gridHtml = filteredPosts.length
     ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px">
-      ${filteredPosts.map(postCard).join('\n      ')}
+      ${filteredPosts.map(postCard).join("\n      ")}
     </div>`
     : `<div style="text-align:center;padding:60px 20px;color:var(--muted)">
       <p style="font-size:1.1rem;margin-bottom:8px">No articles yet</p>
@@ -331,7 +365,7 @@ function buildCategory(category, posts) {
 
   const html = `<!DOCTYPE html>
 <html lang="en">
-${sharedHead(title, catDesc, `${BLOG_BASE_URL}/${category}.html`, filteredPosts[0]?.imageUrl || '', combinedSchema)}
+${sharedHead(title, catDesc, `${BLOG_BASE_URL}/${category}.html`, filteredPosts[0]?.imageUrl || "", combinedSchema)}
 <body>
 ${sharedHeader(category)}
 <!-- Category hero -->
@@ -359,32 +393,38 @@ ${sharedFooter(year)}
 </body>
 </html>`;
 
-  fs.writeFileSync(path.join(PUBLIC, `${category}.html`), html, 'utf8');
+  fs.writeFileSync(path.join(PUBLIC, `${category}.html`), html, "utf8");
   console.log(`✅  ${category}.html built (${filteredPosts.length} posts)`);
 }
 
 // ── Build sitemap.xml ─────────────────────────────────────────────────────────
 function buildSitemap(posts) {
-  const now = new Date().toISOString().split('T')[0];
+  const now = new Date().toISOString().split("T")[0];
   const staticPages = [
-    { url: BLOG_BASE_URL, priority: '1.0', freq: 'daily' },
-    { url: `${BLOG_BASE_URL}/politics.html`, priority: '0.9', freq: 'daily' },
-    { url: `${BLOG_BASE_URL}/economy.html`, priority: '0.9', freq: 'daily' },
-    { url: `${BLOG_BASE_URL}/about.html`, priority: '0.6', freq: 'monthly' },
+    { url: BLOG_BASE_URL, priority: "1.0", freq: "daily" },
+    { url: `${BLOG_BASE_URL}/politics.html`, priority: "0.9", freq: "daily" },
+    { url: `${BLOG_BASE_URL}/economy.html`, priority: "0.9", freq: "daily" },
+    { url: `${BLOG_BASE_URL}/about.html`, priority: "0.6", freq: "monthly" },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
-${staticPages.map((p) => `  <url>
+${staticPages
+  .map(
+    (p) => `  <url>
     <loc>${p.url}</loc>
     <lastmod>${now}</lastmod>
     <changefreq>${p.freq}</changefreq>
     <priority>${p.priority}</priority>
-  </url>`).join('\n')}
-${posts.map((p) => `  <url>
+  </url>`,
+  )
+  .join("\n")}
+${posts
+  .map(
+    (p) => `  <url>
     <loc>${BLOG_BASE_URL}${p.url}</loc>
-    <lastmod>${p.isoDate ? p.isoDate.split('T')[0] : now}</lastmod>
+    <lastmod>${p.isoDate ? p.isoDate.split("T")[0] : now}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <news:news>
@@ -393,19 +433,23 @@ ${posts.map((p) => `  <url>
         <news:language>en</news:language>
       </news:publication>
       <news:publication_date>${p.isoDate || new Date().toISOString()}</news:publication_date>
-      <news:title>${(p.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</news:title>
+      <news:title>${(p.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</news:title>
     </news:news>
-  </url>`).join('\n')}
+  </url>`,
+  )
+  .join("\n")}
 </urlset>`;
 
-  fs.writeFileSync(path.join(PUBLIC, 'sitemap.xml'), xml, 'utf8');
-  console.log(`✅  sitemap.xml built (${posts.length + staticPages.length} URLs)`);
+  fs.writeFileSync(path.join(PUBLIC, "sitemap.xml"), xml, "utf8");
+  console.log(
+    `✅  sitemap.xml built (${posts.length + staticPages.length} URLs)`,
+  );
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 function main() {
-  console.log('\n🏗   The Global Brief — Page Builder');
-  console.log('═'.repeat(44));
+  console.log("\n🏗   The Global Brief — Page Builder");
+  console.log("═".repeat(44));
 
   fs.mkdirSync(PUBLIC, { recursive: true });
 
@@ -413,11 +457,11 @@ function main() {
   console.log(`📚  Found ${posts.length} posts in data/posts.json`);
 
   buildIndex(posts);
-  buildCategory('politics', posts);
-  buildCategory('economy', posts);
+  buildCategory("politics", posts);
+  buildCategory("economy", posts);
   buildSitemap(posts);
 
-  console.log('\n🎉  All pages built successfully!\n');
+  console.log("\n🎉  All pages built successfully!\n");
 }
 
 main();
