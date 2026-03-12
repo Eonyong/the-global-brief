@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /data/
 
-Sitemap: https://bloghosting-b5700.web.app/sitemap.xml
+Sitemap: https://the-global-brief-504d5.web.app/sitemap.xml

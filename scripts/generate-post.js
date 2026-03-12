@@ -355,6 +355,10 @@ async function fetchImage(query) {
 // ── HTML helpers ──────────────────────────────────────────────────────────────
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+// Prevent Claude-generated </script> from breaking page JS
+// (e.g. an article quoting code could contain "</script>")
+const sanitizeContent = (s) => String(s || '').replace(/<\/script>/gi, '<\\/script>');
+
 // ── Ad unit HTML with placeholder fallback ────────────────────────────────────
 let _adIdx = 0;
 function adUnit({ layout = '', format = 'auto', slot = '', inArticle = false } = {}) {
@@ -391,7 +395,7 @@ function buildArticleHtml(article, image, slug, category, dateStr, isoDate) {
     const midAd = i === 1 ? adUnit({ inArticle: true }) : '';
     return `<section id="${esc(s.id)}" class="article-section">
 <h2 class="section-title">${esc(s.title)}</h2>
-${s.content}
+${sanitizeContent(s.content)}
 ${pullQ}
 ${midAd}
 </section>`;
@@ -400,7 +404,7 @@ ${midAd}
   const koSections = (article.ko.sections || []).map((s) =>
     `<section class="article-section">
 <h2 class="section-title">${esc(s.title)}</h2>
-${s.content}
+${sanitizeContent(s.content)}
 </section>`
   ).join('\n');
 
@@ -409,7 +413,7 @@ ${s.content}
     .join('\n');
 
   const tagsHtml = (article.tags || [])
-    .map((t) => `<a href="/economy.html" class="tag">#${esc(t)}</a>`)
+    .map((t) => `<a href="/${category}.html" class="tag">#${esc(t)}</a>`)
     .join(' ');
 
   const schema = JSON.stringify({
@@ -455,6 +459,9 @@ ${s.content}
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="ko_KR">
+<link rel="alternate" hreflang="en" href="${postUrl}">
+<link rel="alternate" hreflang="ko" href="${postUrl}">
+<link rel="alternate" hreflang="x-default" href="${postUrl}">
 <meta property="article:published_time" content="${isoDate}">
 <meta property="article:section" content="${catLabel}">
 ${(article.tags || []).map((t) => `<meta property="article:tag" content="${esc(t)}">`).join('\n')}
@@ -652,11 +659,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
     <!-- English content -->
     <div id="content-en">
-      <div class="intro-body">${article.en.introduction}</div>
+      <div class="intro-body">${sanitizeContent(article.en.introduction)}</div>
       ${enSections}
       <div class="article-section">
         <h2 class="conclusion-title">Conclusion</h2>
-        <div class="conclusion-body">${article.en.conclusion}</div>
+        <div class="conclusion-body">${sanitizeContent(article.en.conclusion)}</div>
       </div>
     </div>
 
@@ -666,10 +673,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <h2>${esc(article.ko.title)}</h2>
         <p>${esc(article.ko.subtitle || '')}</p>
       </div>
-      <div class="intro-body">${article.ko.introduction}</div>
+      <div class="intro-body">${sanitizeContent(article.ko.introduction)}</div>
       ${koSections}
       <div class="article-section">
-        <div class="conclusion-body">${article.ko.conclusion}</div>
+        <div class="conclusion-body">${sanitizeContent(article.ko.conclusion)}</div>
       </div>
     </div>
 

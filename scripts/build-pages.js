@@ -29,7 +29,32 @@ function readPosts() {
 }
 
 // ── Shared header/footer HTML ─────────────────────────────────────────────────
-function sharedHead(title, desc, url, ogImage) {
+function websiteSchema() {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: BLOG_NAME,
+    url: BLOG_BASE_URL,
+    description: 'In-depth analysis of global politics and economics — in English and Korean.',
+    inLanguage: ['en', 'ko'],
+    publisher: {
+      '@type': 'Organization',
+      name: BLOG_NAME,
+      url: BLOG_BASE_URL,
+      logo: { '@type': 'ImageObject', url: `${BLOG_BASE_URL}/logo.png` },
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: { '@type': 'EntryPoint', urlTemplate: `${BLOG_BASE_URL}/?q={search_term_string}` },
+      'query-input': 'required name=search_term_string',
+    },
+  });
+}
+
+function sharedHead(title, desc, url, ogImage, extraSchema) {
+  const schemaBlock = extraSchema
+    ? `<script type="application/ld+json">${extraSchema}</script>`
+    : '';
   return `<head>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');</script>
@@ -48,6 +73,7 @@ ${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
+${schemaBlock}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS_CLIENT}" crossorigin="anonymous"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');</script>
@@ -249,7 +275,7 @@ function buildIndex(posts) {
 
   const html = `<!DOCTYPE html>
 <html lang="en">
-${sharedHead(`${BLOG_NAME} | ${BLOG_TAGLINE}`, 'In-depth analysis of global politics and economics — in English and Korean. Published twice daily.', BLOG_BASE_URL, featOgImg)}
+${sharedHead(`${BLOG_NAME} | ${BLOG_TAGLINE}`, 'In-depth analysis of global politics and economics — in English and Korean. Published twice daily.', BLOG_BASE_URL, featOgImg, websiteSchema())}
 <body>
 ${sharedHeader()}
 ${heroHtml}
@@ -267,14 +293,32 @@ ${sharedFooter(year)}
 }
 
 // ── Build category page ───────────────────────────────────────────────────────
+function breadcrumbSchema(category, catLabelPlain) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: BLOG_BASE_URL },
+      { '@type': 'ListItem', position: 2, name: catLabelPlain, item: `${BLOG_BASE_URL}/${category}.html` },
+    ],
+  });
+}
+
 function buildCategory(category, posts) {
   const year = new Date().getFullYear();
   const catLabel = category === 'politics' ? '🏛 Politics' : '📈 Economy';
+  const catLabelPlain = category === 'politics' ? 'Politics' : 'Economy';
   const catDesc = category === 'politics'
     ? 'In-depth analysis of global political developments, geopolitics, elections, and diplomacy.'
     : 'Expert coverage of global markets, central banks, trade, technology, and economic trends.';
   const filteredPosts = posts.filter((p) => p.category === category);
   const title = `${catLabel} | ${BLOG_NAME}`;
+
+  // Combine WebSite + BreadcrumbList schemas
+  const combinedSchema = JSON.stringify([
+    JSON.parse(websiteSchema()),
+    JSON.parse(breadcrumbSchema(category, catLabelPlain)),
+  ]);
 
   const gridHtml = filteredPosts.length
     ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px">
@@ -287,7 +331,7 @@ function buildCategory(category, posts) {
 
   const html = `<!DOCTYPE html>
 <html lang="en">
-${sharedHead(title, catDesc, `${BLOG_BASE_URL}/${category}.html`, filteredPosts[0]?.imageUrl || '')}
+${sharedHead(title, catDesc, `${BLOG_BASE_URL}/${category}.html`, filteredPosts[0]?.imageUrl || '', combinedSchema)}
 <body>
 ${sharedHeader(category)}
 <!-- Category hero -->
@@ -330,7 +374,8 @@ function buildSitemap(posts) {
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 ${staticPages.map((p) => `  <url>
     <loc>${p.url}</loc>
     <lastmod>${now}</lastmod>
@@ -342,6 +387,14 @@ ${posts.map((p) => `  <url>
     <lastmod>${p.isoDate ? p.isoDate.split('T')[0] : now}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>${BLOG_NAME}</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>${p.isoDate || new Date().toISOString()}</news:publication_date>
+      <news:title>${(p.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</news:title>
+    </news:news>
   </url>`).join('\n')}
 </urlset>`;
 
