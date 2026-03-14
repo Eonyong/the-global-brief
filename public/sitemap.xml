@@ -26,6 +26,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://the-global-brief-504d5.web.app/posts/economy/south-korea-economy-2026-outlook-2026-03-14.html</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>The Global Brief</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-03-14T06:54:53.782Z</news:publication_date>
+      <news:title>South Korea's Economy Navigates a Defining Crossroads in 2026</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://the-global-brief-504d5.web.app/posts/politics/global-democracy-election-integrity-2026-2026-03-14.html</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
