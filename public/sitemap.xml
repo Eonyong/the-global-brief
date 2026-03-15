@@ -3,27 +3,41 @@
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
     <loc>https://the-global-brief-504d5.web.app</loc>
-    <lastmod>2026-03-14</lastmod>
+    <lastmod>2026-03-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/politics.html</loc>
-    <lastmod>2026-03-14</lastmod>
+    <lastmod>2026-03-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/economy.html</loc>
-    <lastmod>2026-03-14</lastmod>
+    <lastmod>2026-03-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/about.html</loc>
-    <lastmod>2026-03-14</lastmod>
+    <lastmod>2026-03-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://the-global-brief-504d5.web.app/posts/politics/north-korea-provocations-diplomacy-2026-2026-03-15.html</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication>
+        <news:name>The Global Brief</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-03-15T01:56:13.176Z</news:publication_date>
+      <news:title>North Korea Escalates Provocations as Diplomacy Stalls in 2026</news:title>
+    </news:news>
   </url>
   <url>
     <loc>https://the-global-brief-504d5.web.app/posts/economy/south-korea-economy-2026-outlook-2026-03-14.html</loc>
